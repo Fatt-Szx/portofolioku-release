@@ -10,17 +10,37 @@
   "use strict";
 
   /**
-   * Apply .scrolled class to the body as the page is scrolled down
+   * Apply .scrolled class and auto-hide/show navbar on scroll
    */
-  function toggleScrolled() {
+  let lastScrollTop = 0;
+  const selectHeader = document.querySelector('#header');
+
+  function handleNavbarScroll() {
     const selectBody = document.querySelector('body');
-    const selectHeader = document.querySelector('#header');
-    if (!selectHeader.classList.contains('scroll-up-sticky') && !selectHeader.classList.contains('sticky-top') && !selectHeader.classList.contains('fixed-top')) return;
-    window.scrollY > 100 ? selectBody.classList.add('scrolled') : selectBody.classList.remove('scrolled');
+    const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
+
+    if (selectHeader) {
+      if (window.scrollY > 100) {
+        selectBody.classList.add('scrolled');
+      } else {
+        selectBody.classList.remove('scrolled');
+      }
+
+      // Hide navbar when scrolling down, show when scrolling up
+      if (!selectBody.classList.contains('mobile-nav-active')) {
+        if (currentScroll > lastScrollTop && currentScroll > 80) {
+          selectHeader.classList.add('header-hidden');
+        } else {
+          selectHeader.classList.remove('header-hidden');
+        }
+      }
+    }
+
+    lastScrollTop = currentScroll <= 0 ? 0 : currentScroll;
   }
 
-  document.addEventListener('scroll', toggleScrolled);
-  window.addEventListener('load', toggleScrolled);
+  document.addEventListener('scroll', handleNavbarScroll, { passive: true });
+  window.addEventListener('load', handleNavbarScroll);
 
   /**
    * Mobile nav toggle
